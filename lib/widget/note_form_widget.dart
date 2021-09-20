@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:notes_app/Provider/theme_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:get/get.dart';
 
 class NoteFormWidget extends StatelessWidget {
   final bool? isImportant;
@@ -50,11 +51,11 @@ class NoteFormWidget extends StatelessWidget {
         ),
         decoration: InputDecoration(
           border: InputBorder.none,
-          hintText: 'Title',
+          hintText: 'title'.tr,
           hintStyle: TextStyle(color: Provider.of<ThemeProvider>(context).isDarkMode? Colors.white70:Colors.blueGrey.shade700,),
         ),
         validator: (title) =>
-            title != null && title.isEmpty ? 'The title cannot be empty' : null,
+            title != null && title.isEmpty ? 'the title cannot be empty'.tr : null,
         onChanged: onChangedTitle,
       );
 
@@ -64,11 +65,11 @@ class NoteFormWidget extends StatelessWidget {
         style: TextStyle(color: Provider.of<ThemeProvider>(context).isDarkMode? Colors.white60:Colors.blueGrey.shade700, fontSize: 18),
         decoration: InputDecoration(
           border: InputBorder.none,
-          hintText: 'Type something...',
+          hintText: 'type something'.tr,
           hintStyle: TextStyle(color: Provider.of<ThemeProvider>(context).isDarkMode? Colors.white60:Colors.blueGrey.shade700, fontSize: 18),
         ),
         validator: (title) => title != null && title.isEmpty
-            ? 'The description cannot be empty'
+            ? 'the description cannot be empty'.tr
             : null,
         onChanged: onChangedDescription,
       );

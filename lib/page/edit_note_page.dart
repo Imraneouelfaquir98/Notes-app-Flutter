@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:notes_app/Provider/theme_provider.dart';
 import 'package:notes_app/db/notes_database.dart';
+import 'package:notes_app/google_ads/ad_state.dart';
 import 'package:notes_app/model/note.dart';
 import 'package:notes_app/widget/note_form_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:get/get.dart';
 
 class AddEditNotePage extends StatefulWidget {
   final Note? note;
@@ -18,6 +21,33 @@ class AddEditNotePage extends StatefulWidget {
 }
 
 class _AddEditNotePageState extends State<AddEditNotePage> {
+
+  BannerAd? banner;
+
+  void dispose() {
+    banner!.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeDependencies(){
+    super.didChangeDependencies();
+    final adState = Provider.of<AdState>(context);
+    adState.initialization.then(
+            (status){
+          setState((){
+            banner = BannerAd(
+                adUnitId: adState.bannerAdUnitUd,
+                size: AdSize.banner,
+                request: AdRequest(),
+                listener: adState.adListener
+            )..load();
+          }
+          );
+        }
+    );
+  }
+
   final _formKey = GlobalKey<FormState>();
   late bool isImportant;
   late int number;
@@ -49,25 +79,38 @@ class _AddEditNotePageState extends State<AddEditNotePage> {
             ),
           ),
         ),
-        body: Form(
-          key: _formKey,
-          child: NoteFormWidget(
-            isImportant: isImportant,
-            number: number,
-            title: title,
-            description: description,
-            onChangedImportant: (isImportant) =>
-                setState(() => this.isImportant = isImportant),
-            onChangedNumber: (number) => setState(() => this.number = number),
-            onChangedTitle: (title) => setState(() => this.title = title),
-            onChangedDescription: (description) =>
-                setState(() => this.description = description),
-          ),
+        body: Stack(
+          children: [
+            Form(
+              key: _formKey,
+              child: NoteFormWidget(
+                isImportant: isImportant,
+                number: number,
+                title: title,
+                description: description,
+                onChangedImportant: (isImportant) =>
+                    setState(() => this.isImportant = isImportant),
+                onChangedNumber: (number) => setState(() => this.number = number),
+                onChangedTitle: (title) => setState(() => this.title = title),
+                onChangedDescription: (description) =>
+                    setState(() => this.description = description),
+              ),
+            ),
+            if(banner != null)
+              Column(
+                children: [
+                  Expanded(child: Container()),
+                  Container(
+                    height: 50,
+                    child: AdWidget(ad: banner!,),
+                  )
+                ],
+              )
+          ]
         ),
       );
 
   Widget buildButton() {
-    final isFormValid = title.isNotEmpty && description.isNotEmpty;
 
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
@@ -77,7 +120,7 @@ class _AddEditNotePageState extends State<AddEditNotePage> {
         ),
         onPressed: addOrUpdateNote,
         child: Text(
-            'Save',
+            'save'.tr,
             style: TextStyle(
               color: Provider.of<ThemeProvider>(context).isDarkMode? Colors.blueGrey.shade700:Colors.white,
               fontWeight: FontWeight.bold,

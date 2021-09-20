@@ -63,9 +63,9 @@ class NoteCardWidget extends StatelessWidget {
       case 0:
         return 100;
       case 1:
-        return 150;
+        return 130;
       case 2:
-        return 150;
+        return 130;
       case 3:
         return 100;
       default:
